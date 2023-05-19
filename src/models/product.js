@@ -53,8 +53,8 @@ async function getAllProducts() {
         "products.description",
         "products.price",
         "products.review",
-        "users.image",
-        "products.number",
+        "products.image",
+        "users.number",
         "users.firstname",
         "users.lastname",
         "users.address",
@@ -92,7 +92,7 @@ async function getMyProducts(userId) {
 async function getSingleProduct(productId) {
   try {
     const products = await knex("products")
-      .where({ id: productId })
+      .where('products.id', '=', productId )
       .innerJoin("users", "products.seller", "=", "users.id")
       .innerJoin("categorys", "products.category", "=", "categorys.id")
       .select(
