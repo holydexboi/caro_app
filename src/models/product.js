@@ -34,9 +34,9 @@ async function createTable() {
 
 async function createProduct(product) {
   try {
-    const product = await knex("products").insert(product);
+    const output = await knex("products").insert(product);
 
-    return product;
+    return output;
   } catch (err) {
     throw new Error(err);
   }

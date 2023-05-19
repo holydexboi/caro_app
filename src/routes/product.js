@@ -1,8 +1,11 @@
 const express = require("express");
 const auth = require("../middleware/auth");
+const multer = require('multer');
 const cloudinary = require("cloudinary").v2;
 const Product = require("../models/product");
 const { v4 } = require("uuid");
+
+const upload = multer({ dest: 'uploads/' })
 
 cloudinary.config({
   cloud_name: "dyw9ms10v",
@@ -48,10 +51,10 @@ router.post("/create", auth, async (req, res) => {
     });
 });
 
-router.post("/upload", async (req, res) => {
-  if (req.body.imageUrl) return res.status(400).send("No image selected");
-  console.log(req);
-  const resp = cloudinary.uploader.upload(req.body.imageUrl);
+router.post("/upload", upload.single('avatar'), async (req, res) => {
+  if (!req.file) return res.status(400).send("No image selected");
+  console.log(req.file);
+  const resp = cloudinary.uploader.upload(req.file.path);
 
   resp
     .then((data) => {
