@@ -17,7 +17,9 @@ router.post('/register', async (req, res) => {
     if (!req.body.gender) return res.status(400).send('Gender is not define')
     if (!req.body.email) return res.status(400).send('Email not define')
     if (!req.body.password) return res.status(400).send('Password not define')
-    if(!req.body.address) return res.status(400).send('Address type not define')
+    if(!req.body.address) return res.status(400).send('Address not define')
+    if(!req.body.state) return res.status(400).send('State not define')
+    if(!req.body.lga) return res.status(400).send('Local Government not define')
     
     
     const userId = v4()
@@ -28,14 +30,16 @@ router.post('/register', async (req, res) => {
     const lastname = req.body.lastname
     const gender = req.body.gender
     const address = req.body.address
+    const state = req.body.state
+    const lga = req.body.lga
 
 
-    User.add({id: userId, email, password, firstname, lastname, gender, address})
+    User.add({id: userId, email, password, firstname, lastname, gender, address, state, lga})
         .then(user => {
             const token = jwt.sign({ _id: userId}, config.get('jwtPrivateKey'));
             res.header('x-auth-token', token)
             .header("access-control-expose-headers", "x-auth-token")
-            .send({token, userId, email, firstname, lastname, gender, address});
+            .send({token, userId, email, firstname, lastname, gender, address, lga, state});
         })
         .catch(error => {
         res.status(400).send(error.message)
@@ -70,7 +74,7 @@ router.put('/update', auth, async (req, res) => {
     User.changeProfile({ password, firstname, lastname, address}, req.user._id)
         .then(user => {
             const token = jwt.sign({ _id: req.user._id }, config.get('jwtPrivateKey'));
-            res.header('x-auth-token', token).send({userId: req.user._Id, firstname, lastname, address});
+            res.header('x-auth-token', token).send({token, ...user});
         })
         .catch(error => {
         res.status(500).send(error.message)

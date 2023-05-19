@@ -22,6 +22,8 @@ async function createTable() {
               table.unique("email");
               table.string("password");
               table.string("address");
+              table.string("state");
+              table.string("lga");
               table.timestamp("created_at", { precision: 6 }).defaultTo(knex.fn.now(6));
             });        }
         create()
@@ -74,7 +76,7 @@ async function changeProfile(user, userId) {
     console.log(user)
   const output = await knex('users')
       .where({ id: userId })
-      .select('id','email','password', 'firstname', 'lastname', 'address')
+      .select('id','email','password', 'firstname', 'lastname', 'address', 'gender')
   
   if (!output[0]) throw new Error('User does not exist')
   const firstname = user.firstname === '' ? output.firstname : user.firstname 
@@ -90,7 +92,7 @@ async function changeProfile(user, userId) {
             address: address,
         })
   
-  return response
+  return {userId: output.id, firstname, lastname, password, address, email: output.email, gender: output.gender}
 }
 
 module.exports = { createTable, add, signin, changeProfile, getUser};

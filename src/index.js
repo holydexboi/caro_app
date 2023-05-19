@@ -3,6 +3,7 @@ const cors = require('cors')
 const config = require('config')
 const user = require('../src/routes/user')
 const auth = require('../src/routes/auth')
+const category = require('../src/routes/category')
 const knexConfig = require('../src/knexfile')
 
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/user', user)
 app.use('/api/signin', auth)
+app.use('/api/category', category)
 
 const port = process.env.PORT || 3000
 
