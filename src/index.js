@@ -3,9 +3,14 @@ const cors = require('cors')
 const config = require('config')
 const user = require('../src/routes/user')
 const auth = require('../src/routes/auth')
+const bodyParser = require('body-parser');
 const category = require('../src/routes/category')
+const product = require('../src/routes/product')
 const knexConfig = require('../src/knexfile')
 
+
+const multer = require('multer');
+const upload = multer();
 
 console.log(process.env.NODE_ENV)
 if(!config.get('jwtPrivateKey')){
@@ -18,9 +23,12 @@ knexConfig
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+app.use(upload.array()); 
+app.use(express.static('public'));
 app.use('/api/user', user)
 app.use('/api/signin', auth)
 app.use('/api/category', category)
+app.use('/api/product', product)
 
 const port = process.env.PORT || 3000
 

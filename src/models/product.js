@@ -43,23 +43,28 @@ async function createProduct(product) {
 }
 
 async function getAllProducts() {
-  const products = await knex("products")
-    .innerJoin("users", "products.seller", "=", "users.id")
-    .innerJoin("categorys", "products.category", "=", "categorys.id")
-    .select(
-      "products.id",
-      "products.name",
-      "products.description",
-      "products.price",
-      "products.review",
-      "products.image",
-      "users.firstname",
-      "users.lastname",
-      "users.address",
-      "categorys.name"
-    );
+  try {
+    const products = await knex("products")
+      .innerJoin("users", "products.seller", "=", "users.id")
+      .innerJoin("categorys", "products.category", "=", "categorys.id")
+      .select(
+        "products.id",
+        "products.name",
+        "products.description",
+        "products.price",
+        "products.review",
+        "users.image",
+        "products.number",
+        "users.firstname",
+        "users.lastname",
+        "users.address",
+        "categorys.name"
+      );
 
-  return products;
+    return products;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 }
 
 async function getMyProducts(userId) {
@@ -74,6 +79,7 @@ async function getMyProducts(userId) {
       "products.price",
       "products.review",
       "products.image",
+      "users.number",
       "users.firstname",
       "users.lastname",
       "users.address",
@@ -83,25 +89,83 @@ async function getMyProducts(userId) {
   return products;
 }
 
-async function getSingleProduct(productId){
+async function getSingleProduct(productId) {
+  try {
+    const products = await knex("products")
+      .where({ id: productId })
+      .innerJoin("users", "products.seller", "=", "users.id")
+      .innerJoin("categorys", "products.category", "=", "categorys.id")
+      .select(
+        "products.id",
+        "products.name",
+        "products.description",
+        "products.price",
+        "products.review",
+        "users.number",
+        "products.image",
+        "users.firstname",
+        "users.lastname",
+        "users.address",
+        "categorys.name"
+      );
 
-  const products = await knex("products")
-  .where({id: productId})
-  .innerJoin(
-    'users', 
-    'products.seller', 
-    '=', 
-    'users.id'
-  )
-  .innerJoin(
-    'categorys', 
-    'products.category', 
-    '=', 
-    'categorys.id'
-  )
-    .select('products.id', 'products.name', 'products.description', 'products.price', 'products.review', 'products.image', 'users.firstname', 'users.lastname', 'users.address', 'categorys.name')
-  
-    return products
+    return products;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 }
 
-module.exports = { createProduct };
+async function editProduct(productId, product) {
+  const output = await knex("products")
+    .where({ id: productId })
+    .select("id", "name", "description", "price", "review", "image", "address");
+
+  if (!output[0]) throw new Error("No product with the given Id");
+  const name = product.name === "" ? output.name : product.name;
+  const description =
+    product.description === "" ? output.description : product.description;
+  const price = product.price === "" ? output.price : product.price;
+  const image = product.image === "" ? output.image : product.image;
+  const address = product.address === "" ? output.address : product.address;
+
+  try {
+    const response = await knex("products").where("id", "=", productId).update({
+      name: name,
+      description,
+      price,
+      image,
+      address,
+    });
+
+    return {
+      id: productId,
+      name,
+      description,
+      price,
+      image,
+      address,
+    };
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+async function deleteProduct(productId) {
+  try {
+    const output = await knex("products").where({ id: productId }).del();
+
+    return output;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+module.exports = {
+  createTable,
+  createProduct,
+  getAllProducts,
+  getMyProducts,
+  getSingleProduct,
+  editProduct,
+  deleteProduct,
+};
