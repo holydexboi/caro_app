@@ -52,6 +52,7 @@ router.post("/create", auth, async (req, res) => {
 });
 
 router.post("/upload", upload.single('avatar'), async (req, res) => {
+    
   if (!req.file) return res.status(400).send("No image selected");
   console.log(req.file);
   const resp = cloudinary.uploader.upload(req.file.path);
@@ -87,7 +88,8 @@ router.get("/product/:id", async (req, res) => {
 });
 
 router.get("/myproducts", auth, async (req, res) => {
-  Product.getSingleProduct(req.user._id)
+    console.log(req.user._id)
+  Product.getMyProducts(req.user._id)
     .then((product) => {
       res.send(product);
     })
@@ -96,7 +98,7 @@ router.get("/myproducts", auth, async (req, res) => {
     });
 });
 
-router.put("/update/:id", async (req, res) => {
+router.put("/update/:id", auth, async (req, res) => {
   const name = req.body.name ? req.body.name : "";
   const description = req.body.description ? req.body.description : "";
   const price = req.body.price ? req.body.price : "";
@@ -107,7 +109,6 @@ router.put("/update/:id", async (req, res) => {
     description,
     price,
     image,
-    category,
   })
     .then((product) => {
       res.send(product);
@@ -117,10 +118,10 @@ router.put("/update/:id", async (req, res) => {
     });
 });
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", auth, async (req, res) => {
   Product.deleteProduct(req.params.id)
     .then((product) => {
-      res.send(product);
+      res.send('Deleted Successfully');
     })
     .catch((error) => {
       res.status(400).send(error.message);

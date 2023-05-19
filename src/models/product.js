@@ -47,19 +47,19 @@ async function getAllProducts() {
     const products = await knex("products")
       .innerJoin("users", "products.seller", "=", "users.id")
       .innerJoin("categorys", "products.category", "=", "categorys.id")
-      .select(
-        "products.id",
-        "products.name",
-        "products.description",
-        "products.price",
-        "products.review",
-        "products.image",
-        "users.number",
-        "users.firstname",
-        "users.lastname",
-        "users.address",
-        "categorys.name"
-      );
+      .select({
+        id: "products.id",
+        name: "products.name",
+        description: "products.description",
+        price: "products.price",
+        reviews: "products.review",
+        image: "products.image",
+        number: "users.number",
+        firstname: "users.firstname",
+        lastname: "users.lastname",
+        address: "users.address",
+        categoryName: "categorys.name",
+      });
 
     return products;
   } catch (err) {
@@ -68,46 +68,50 @@ async function getAllProducts() {
 }
 
 async function getMyProducts(userId) {
-  const products = await knex("products")
-    .where({ seller: userId })
-    .innerJoin("users", "products.seller", "=", "users.id")
-    .innerJoin("categorys", "products.category", "=", "categorys.id")
-    .select(
-      "products.id",
-      "products.name",
-      "products.description",
-      "products.price",
-      "products.review",
-      "products.image",
-      "users.number",
-      "users.firstname",
-      "users.lastname",
-      "users.address",
-      "categorys.name"
-    );
-
-  return products;
+  try {
+    const products = await knex("products")
+      .where("seller", userId)
+      .innerJoin("users", "products.seller", "=", "users.id")
+      .innerJoin("categorys", "products.category", "=", "categorys.id")
+      .select({
+        id: "products.id",
+        name: "products.name",
+        description: "products.description",
+        price: "products.price",
+        reviews: "products.review",
+        image: "products.image",
+        number: "users.number",
+        firstname: "users.firstname",
+        lastname: "users.lastname",
+        address: "users.address",
+        categoryName: "categorys.name",
+      });
+    console.log(products);
+    return products;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 }
 
 async function getSingleProduct(productId) {
   try {
     const products = await knex("products")
-      .where('products.id', '=', productId )
+      .where("products.id", "=", productId)
       .innerJoin("users", "products.seller", "=", "users.id")
       .innerJoin("categorys", "products.category", "=", "categorys.id")
-      .select(
-        "products.id",
-        "products.name",
-        "products.description",
-        "products.price",
-        "products.review",
-        "users.number",
-        "products.image",
-        "users.firstname",
-        "users.lastname",
-        "users.address",
-        "categorys.name"
-      );
+      .select({
+        id: "products.id",
+        name: "products.name",
+        description: "products.description",
+        price: "products.price",
+        reviews: "products.review",
+        image: "products.image",
+        number: "users.number",
+        firstname: "users.firstname",
+        lastname: "users.lastname",
+        address: "users.address",
+        categoryName: "categorys.name",
+      });
 
     return products;
   } catch (err) {
@@ -118,7 +122,7 @@ async function getSingleProduct(productId) {
 async function editProduct(productId, product) {
   const output = await knex("products")
     .where({ id: productId })
-    .select("id", "name", "description", "price", "review", "image", "address");
+    .select("id", "name", "description", "price", "review", "image");
 
   if (!output[0]) throw new Error("No product with the given Id");
   const name = product.name === "" ? output.name : product.name;
@@ -126,7 +130,6 @@ async function editProduct(productId, product) {
     product.description === "" ? output.description : product.description;
   const price = product.price === "" ? output.price : product.price;
   const image = product.image === "" ? output.image : product.image;
-  const address = product.address === "" ? output.address : product.address;
 
   try {
     const response = await knex("products").where("id", "=", productId).update({
@@ -134,7 +137,6 @@ async function editProduct(productId, product) {
       description,
       price,
       image,
-      address,
     });
 
     return {
@@ -143,7 +145,6 @@ async function editProduct(productId, product) {
       description,
       price,
       image,
-      address,
     };
   } catch (err) {
     throw new Error(err.message);
