@@ -5,6 +5,7 @@ const user = require('../src/routes/user')
 const auth = require('../src/routes/auth')
 const category = require('../src/routes/category')
 const product = require('../src/routes/product')
+const comment = require('../src/routes/comment')
 const knexConfig = require('../src/knexfile')
 
 
@@ -24,6 +25,7 @@ app.use('/api/user', user)
 app.use('/api/signin', auth)
 app.use('/api/category', category)
 app.use('/api/product', product)
+app.use('/api/comment', comment)
 
 const port = process.env.PORT || 3000
 
