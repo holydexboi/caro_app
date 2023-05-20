@@ -14,6 +14,7 @@ async function createTable() {
               table.string("description");
               table.float("price");
               table.float("review");
+              table.integer("numberOfReview");
               table.string("image");
               table.string("seller");
               table.foreign("seller").references("id").inTable("users");
@@ -53,6 +54,7 @@ async function getAllProducts() {
         description: "products.description",
         price: "products.price",
         reviews: "products.review",
+        numberOfReview: "products.numberOfReview",
         image: "products.image",
         number: "users.number",
         firstname: "users.firstname",
@@ -79,6 +81,7 @@ async function getMyProducts(userId) {
         description: "products.description",
         price: "products.price",
         reviews: "products.review",
+        numberOfReview: "products.numberOfReview",
         image: "products.image",
         number: "users.number",
         firstname: "users.firstname",
@@ -105,6 +108,7 @@ async function getSingleProduct(productId) {
         description: "products.description",
         price: "products.price",
         reviews: "products.review",
+        numberOfReview: "products.numberOfReview",
         image: "products.image",
         number: "users.number",
         firstname: "users.firstname",
@@ -151,6 +155,35 @@ async function editProduct(productId, product) {
   }
 }
 
+async function editReview(productId, reviewPoint) {
+  const output = await knex("products")
+    .where({ id: productId })
+    .select(
+      "id",
+      "name",
+      "description",
+      "price",
+      "review",
+      "products.numberOfReview",
+      "image"
+    );
+
+  if (!output[0]) throw new Error("No product with the given Id");
+
+  try {
+    const response = await knex("products")
+      .where("id", "=", productId)
+      .increment({
+        review: reviewPoint,
+        numberOfReview: 1,
+      });
+console.log(response)
+    return response;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
 async function deleteProduct(productId) {
   try {
     const output = await knex("products").where({ id: productId }).del();
@@ -168,5 +201,6 @@ module.exports = {
   getMyProducts,
   getSingleProduct,
   editProduct,
+  editReview,
   deleteProduct,
 };
