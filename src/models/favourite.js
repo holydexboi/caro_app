@@ -28,6 +28,14 @@ async function createTable() {
 }
 
 async function createFavourite(favourite) {
+  const productExist = await knex("favourites")
+    .where({
+      user: favourite.user,
+      product: favourite.product,
+    })
+    .select("id", "product", "user");
+
+  if (productExist[0]) throw new Error("You already add this product");
   try {
     const output = await knex("favourites").insert(favourite);
 
@@ -65,8 +73,19 @@ async function getUserWish(userId) {
   }
 }
 
+async function deleteFavourite(favoriteId) {
+  try {
+    const output = await knex("favourites").where({ id: favoriteId }).del();
+
+    return output;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
 module.exports = {
   createFavourite,
   createTable,
   getUserWish,
+  deleteFavourite,
 };

@@ -34,4 +34,14 @@ router.get("/mywishlist", auth, (req, res) => {
     });
 });
 
+router.delete("/delete/:id", auth, async (req, res) => {
+  Favourite.deleteFavourite(req.params.id)
+    .then((favourite) => {
+      res.send("Product removed successfully");
+    })
+    .catch((error) => {
+      res.status(400).send(error.message);
+    });
+});
+
 module.exports = router;
